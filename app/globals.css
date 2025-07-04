@@ -63,10 +63,13 @@
   * {
     @apply border-border;
   }
+
   html {
     overflow-x: hidden;
     height: 100%;
+    position: relative;
   }
+
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
@@ -110,15 +113,30 @@
     overflow-x: hidden;
   }
 
-  /* Fix mobile scrolling issues */
-  body {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
-
+  /* Fix mobile scrolling issues completely */
   html {
     overflow-x: hidden;
     max-width: 100vw;
+    position: relative;
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
+  }
+
+  /* Ensure page wrapper takes exact viewport height */
+  .page-wrapper {
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Footer should not create extra space */
+  footer {
+    margin-bottom: 0 !important;
+    padding-bottom: 3rem !important;
   }
 }
 
@@ -134,8 +152,29 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  position: relative;
 }
 
 .content-wrapper {
   flex: 1;
+}
+
+/* Ensure footer doesn't create extra scrollable space */
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* Mobile-specific footer fixes */
+@media (max-width: 768px) {
+  .page-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+
+  footer {
+    position: relative;
+    bottom: 0;
+    margin-bottom: 0;
+  }
 }

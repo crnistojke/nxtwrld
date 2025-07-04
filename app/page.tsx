@@ -132,7 +132,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper min-h-screen">
       <div className="content-wrapper">
         {/* Notification Banner */}
         <NotificationBanner />
@@ -249,8 +249,8 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-12 relative z-10">
+      {/* Footer - Fixed at bottom */}
+      <footer className="bg-white border-t border-gray-200 py-8 md:py-12 relative z-10 mt-auto">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             {/* Brand Section */}

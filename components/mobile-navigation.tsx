@@ -21,31 +21,40 @@ export function MobileNavigation({ onContactClick, onWishlistClick, wishlistCoun
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMenuOpen) {
+      // Completely lock the body
       document.body.style.overflow = "hidden"
       document.body.style.position = "fixed"
       document.body.style.top = "0"
       document.body.style.left = "0"
       document.body.style.right = "0"
+      document.body.style.bottom = "0"
       document.body.style.width = "100%"
       document.body.style.height = "100%"
+      document.documentElement.style.overflow = "hidden"
     } else {
-      document.body.style.overflow = "unset"
-      document.body.style.position = "unset"
-      document.body.style.top = "unset"
-      document.body.style.left = "unset"
-      document.body.style.right = "unset"
-      document.body.style.width = "unset"
-      document.body.style.height = "unset"
+      // Restore normal scrolling
+      document.body.style.overflow = ""
+      document.body.style.position = ""
+      document.body.style.top = ""
+      document.body.style.left = ""
+      document.body.style.right = ""
+      document.body.style.bottom = ""
+      document.body.style.width = ""
+      document.body.style.height = ""
+      document.documentElement.style.overflow = ""
     }
 
     return () => {
-      document.body.style.overflow = "unset"
-      document.body.style.position = "unset"
-      document.body.style.top = "unset"
-      document.body.style.left = "unset"
-      document.body.style.right = "unset"
-      document.body.style.width = "unset"
-      document.body.style.height = "unset"
+      // Cleanup on unmount
+      document.body.style.overflow = ""
+      document.body.style.position = ""
+      document.body.style.top = ""
+      document.body.style.left = ""
+      document.body.style.right = ""
+      document.body.style.bottom = ""
+      document.body.style.width = ""
+      document.body.style.height = ""
+      document.documentElement.style.overflow = ""
     }
   }, [isMenuOpen])
 
@@ -83,26 +92,59 @@ export function MobileNavigation({ onContactClick, onWishlistClick, wishlistCoun
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay - Full Screen with No Scroll */}
+      {/* Mobile Menu Overlay - Completely Fixed */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          {/* Full Screen Menu - Fixed Height */}
-          <div className="fixed inset-0 bg-white" style={{ height: "100vh", overflow: "hidden" }}>
-            {/* Menu Header */}
-            <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <div
+          className="fixed inset-0 z-50 md:hidden"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
+            overflow: "hidden",
+          }}
+        >
+          {/* Full Screen Menu - Exact viewport dimensions */}
+          <div
+            className="bg-white"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: "100vw",
+              height: "100vh",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {/* Menu Header - Fixed height */}
+            <div
+              className="flex items-center justify-between px-6 border-b border-gray-200 bg-white"
+              style={{ height: "64px", flexShrink: 0 }}
+            >
               <span className="text-lg font-bold tracking-[0.2em] text-black">NXT WRLD</span>
               <Button variant="ghost" size="sm" onClick={closeMenu} className="p-2">
                 <X className="h-6 w-6 text-black" strokeWidth={1.5} />
               </Button>
             </div>
 
-            {/* Menu Items - Fixed positioning with exact height */}
+            {/* Menu Items - Exact remaining height */}
             <div
-              style={{ height: "calc(100vh - 4rem)", overflow: "hidden" }}
-              className="flex items-start justify-center pt-12"
+              className="flex items-center justify-center bg-white"
+              style={{
+                height: "calc(100vh - 64px)",
+                overflow: "hidden",
+                flexShrink: 0,
+              }}
             >
-              <nav className="text-center w-full">
-                <ul className="space-y-5 px-6">
+              <nav className="text-center">
+                <ul className="space-y-6">
                   <li>
                     <Link
                       href="/"
