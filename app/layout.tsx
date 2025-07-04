@@ -1,86 +1,76 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { Inter } from "next/font/google"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "NXT WRLD - Premium Streetwear Collection",
-  description:
-    "Discover the future of streetwear with NXT WRLD. Premium hoodies, t-shirts, and exclusive drops. Step into the next world of fashion.",
-  keywords: ["streetwear", "fashion", "hoodies", "t-shirts", "premium clothing", "NXT WRLD", "urban fashion"],
+  description: "Discover the future of streetwear with NXT WRLD. Premium hoodies, t-shirts, and exclusive drops.",
+  keywords: ["streetwear", "fashion", "hoodies", "premium clothing", "NXT WRLD"],
   authors: [{ name: "NXT WRLD" }],
   creator: "NXT WRLD",
   publisher: "NXT WRLD",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL("https://nxtwrldoff.vercel.app"),
-  alternates: {
-    canonical: "/",
+  robots: {
+    index: true,
+    follow: true,
   },
   openGraph: {
-    title: "NXT WRLD - Premium Streetwear Collection",
-    description:
-      "Discover the future of streetwear with NXT WRLD. Premium hoodies, t-shirts, and exclusive drops. Step into the next world of fashion.",
+    type: "website",
+    locale: "en_US",
     url: "https://nxtwrldoff.vercel.app",
+    title: "NXT WRLD - Premium Streetwear Collection",
+    description: "Discover the future of streetwear with NXT WRLD. Premium hoodies, t-shirts, and exclusive drops.",
     siteName: "NXT WRLD",
     images: [
       {
         url: "/images/logonxtwrld.png",
         width: 1200,
         height: 630,
-        alt: "NXT WRLD Logo - Premium Streetwear Brand",
+        alt: "NXT WRLD Logo",
       },
       {
         url: "/images/nxtwrldhoodie.webp",
         width: 1200,
         height: 630,
-        alt: "NXT WRLD Premium Hoodie Collection",
+        alt: "NXT WRLD Premium Hoodie",
       },
     ],
-    locale: "en_US",
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "NXT WRLD - Premium Streetwear Collection",
     description: "Discover the future of streetwear with NXT WRLD. Premium hoodies, t-shirts, and exclusive drops.",
-    images: ["/images/logonxtwrld.png"],
     creator: "@nxtwrld.wear",
-    site: "@nxtwrld.wear",
+    images: ["/images/logonxtwrld.png"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+  icons: {
+    icon: "/images/logonxtwrld.png",
+    shortcut: "/images/logonxtwrld.png",
+    apple: "/images/logonxtwrld.png",
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
+  manifest: "/manifest.json",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/images/logonxtwrld.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/images/logonxtwrld.png" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-      </head>
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <div className="page-wrapper">
+            <div className="content-wrapper">{children}</div>
+          </div>
+          <Toaster />
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
