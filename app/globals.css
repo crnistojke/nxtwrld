@@ -1,3 +1,16 @@
+Pogovor je odprt. 1 neprebrano sporočilo.
+
+Preskoči na vsebino
+Uporaba storitve Gmail z bralniki zaslona
+
+1 od 4.098
+(ni zadeve)
+Prejeto
+
+MStyc <sezunmaj@gmail.com>
+18:48 (pred 0 minutami)
+Za jaz
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -62,21 +75,33 @@
 @apply border-border;
 }
 
-html {
-overflow-x: hidden;
+html, body {
 height: 100%;
 max-width: 100%;
+overflow-x: hidden;
 }
 
 body {
 @apply bg-background text-foreground;
-overflow-x: hidden;
-min-height: 100%;
-max-width: 100%;
 position: relative;
+overflow-y: auto;
+-webkit-overflow-scrolling: touch;
 }
 }
 
+/* Poskusi zamenjati 100vh z 100svh – boljše na iOS */
+.page-wrapper {
+min-height: 100svh;
+display: flex;
+flex-direction: column;
+overflow-x: hidden;
+}
+
+.content-wrapper {
+flex: 1;
+}
+
+/* Animacija */
 @keyframes fade-in {
 from {
 opacity: 0;
@@ -92,7 +117,7 @@ transform: translateY(0);
 animation: fade-in 0.5s ease-in-out;
 }
 
-/* Mobile optimizations */
+/* Mobilne prilagoditve */
 @media (max-width: 768px) {
 .hero-text {
 font-size: 3rem !important;
@@ -110,35 +135,18 @@ padding: 3rem 0 !important;
 max-width: 100%;
 overflow-x: hidden;
 }
-}
 
-/* Prevent horizontal scroll globally */
-.no-scroll-x {
-overflow-x: hidden;
-max-width: 100%;
-}
-
-/* Page wrapper to prevent over-scroll */
-.page-wrapper {
-min-height: 100svh;
-display: flex;
-flex-direction: column;
-overflow-x: hidden;
-}
-
-.content-wrapper {
-flex: 1;
-}
-
-/* Mobile navigation text positioning */
-@media (max-width: 768px) {
 .mobile-brand-text {
 transform: translateX(-8px) !important;
 font-weight: 800 !important;
 }
 }
 
-/* Desktop navigation text */
 .desktop-brand-text {
 font-weight: 800 !important;
+}
+
+.no-scroll-x {
+overflow-x: hidden;
+max-width: 100%;
 }
