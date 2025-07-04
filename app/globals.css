@@ -72,7 +72,7 @@
     overflow-x: hidden;
     min-height: 100%;
     position: relative;
-    overscroll-behavior:none;
+    overscroll-behavior: none;
   }
 }
 
