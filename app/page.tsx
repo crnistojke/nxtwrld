@@ -132,7 +132,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="page-wrapper min-h-screen">
+    <div className="page-wrapper">
       <div className="content-wrapper">
         {/* Notification Banner */}
         <NotificationBanner />
@@ -249,10 +249,10 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* Footer - Fixed at bottom */}
-      <footer className="bg-white border-t border-gray-200 py-8 md:py-12 relative z-10 mt-auto">
+      {/* Footer - Fixed at bottom with no extra space */}
+      <footer className="bg-white border-t border-gray-200 py-6 md:py-8 relative z-10">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
             {/* Brand Section */}
             <div className="md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
@@ -265,7 +265,7 @@ export default function HomePage() {
                 />
                 <span className="text-2xl font-bold text-gray-900">NXT WRLD</span>
               </div>
-              <p className="text-gray-600 mb-6 max-w-md">
+              <p className="text-gray-600 mb-4 md:mb-6 max-w-md">
                 Transform your style, transform your world. Premium streetwear designed for the next generation.
               </p>
               <div className="flex space-x-4">
@@ -299,8 +299,8 @@ export default function HomePage() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
-              <ul className="space-y-2">
+              <h4 className="font-semibold text-gray-900 mb-3 md:mb-4">Quick Links</h4>
+              <ul className="space-y-1 md:space-y-2">
                 <li>
                   <Link href="/" className="text-gray-600 hover:text-purple-600 transition-colors">
                     Home
@@ -326,8 +326,8 @@ export default function HomePage() {
 
             {/* Support */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Support</h4>
-              <ul className="space-y-2">
+              <h4 className="font-semibold text-gray-900 mb-3 md:mb-4">Support</h4>
+              <ul className="space-y-1 md:space-y-2">
                 <li>
                   <Link href="/terms-of-service" className="text-gray-600 hover:text-purple-600 transition-colors">
                     Terms of Service
@@ -343,8 +343,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-8 text-center">
-            <p className="text-gray-500">&copy; 2025 NXT WRLD. All rights reserved.</p>
+          <div className="border-t border-gray-200 pt-4 md:pt-6 text-center">
+            <p className="text-gray-500 text-sm md:text-base">&copy; 2025 NXT WRLD. All rights reserved.</p>
           </div>
         </div>
       </footer>
