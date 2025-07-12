@@ -45,7 +45,7 @@ export default function HomePage() {
       id: 1,
       name: "NXT WRLD Globe Tee - White",
       images: ["/images/nxtwrldtshirtwhite.webp", "/images/nxtwrldtshirtwhite2.webp"],
-      price: "$45.99",
+      price: "$29.99",
       category: "t-shirt",
       description:
         "Classic white tee featuring our iconic globe and butterflies design. Made from premium cotton blend for ultimate comfort and durability.",
@@ -65,7 +65,7 @@ export default function HomePage() {
       id: 2,
       name: "NXT WRLD Globe Tee - Black",
       images: ["/images/nxtwrldtshirt.webp", "/images/nxtwrldtshirt2.webp"],
-      price: "$45.99",
+      price: "$29.99",
       category: "t-shirt",
       description:
         "Bold black tee with our signature transformation design. Perfect for making a statement while staying comfortable.",
@@ -83,7 +83,7 @@ export default function HomePage() {
       id: 3,
       name: "NXT WRLD Globe Hoodie",
       images: ["/images/nxtwrldhoodie2.webp", "/images/nxtwrldhoodie.webp"],
-      price: "$69.99",
+      price: "$54.99",
       category: "hoodie",
       description:
         "Premium hoodie featuring our transformative globe design. Cozy and stylish, perfect for any season.",
