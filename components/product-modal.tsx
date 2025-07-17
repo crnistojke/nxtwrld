@@ -1,27 +1,8 @@
 "use client"
 import React, { useState, useEffect } from "react"
-import { X, ChevronLeft, ChevronRight, Heart, CheckCircle } from "lucide-react"
+import { X, ChevronLeft, ChevronRight, Heart } from "lucide-react"
 
-// --- Type Definitions (Interfaces) ---
-interface Product {
-  id: number
-  name: string
-  images: string[]
-  price: string
-  category: string
-  description: string
-  sizes: string[]
-  details: string[]
-}
-
-interface CheckoutDetails {
-  product: Product
-  selectedSize: string
-  finalPrice: string
-  promoApplied: boolean
-}
-
-// --- UI Helper Components (since we don't have access to @/components/ui) ---
+// --- Helper Component (lahko ga premaknete v skupno datoteko, npr. components/ui/button.tsx) ---
 const Button = ({ children, onClick, variant = 'default', size = 'md', className = '', disabled = false }: { children: React.ReactNode, onClick?: () => void, variant?: string, size?: string, className?: string, disabled?: boolean }) => {
   const baseStyle = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none"
   const variants = {
@@ -40,20 +21,34 @@ const Button = ({ children, onClick, variant = 'default', size = 'md', className
   )
 }
 
-// --- Payment Method Icons ---
-const PaypalIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M14.5.6c.3 0 .6.1.8.4l5.4 9.4c.2.4.2.9 0 1.3l-5.4 9.4c-.2.3-.5.4-.8.4H4.8c-.3 0-.6-.1-.8-.4L-1.4 11.7c-.2-.4-.2-.9 0-1.3L4 .6c.2-.3.5-.4.8-.4h9.7z"/><path d="M6.3 16v-8h2c.6 0 1.1.2 1.5.5.4.3.6.8.6 1.4 0 .6-.2 1-.5 1.3-.3.3-.8.5-1.4.5h-1v3.3h-1.2zm2.1-5.8c.3 0 .5-.1.7-.3.2-.2.3-.4.3-.7s-.1-.5-.3-.7c-.2-.2-.4-.3-.7-.3h-.8v2h.8zM12 16l-1-8h1.2l.5 4.1.5-4.1h1.1l.5 4.1.5-4.1h1.2l-1 8h-1.2l-.6-4-1.2 4h-1z"/></svg>
-const MastercardIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" {...props}><circle cx="8" cy="12" r="7" fill="#EA001B"/><circle cx="16" cy="12" r="7" fill="#F79E1B" fillOpacity="0.8"/></svg>
-const BankIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 21h18M5 18v-8h14v8M5 10V5l7-4 7 4v5M3 21h18"/></svg>
-const BitcoinIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M10.5 7.5h2.4c.8 0 1.5.3 2 .8s.8 1.2.8 2.2c0 1-.3 1.7-.8 2.2s-1.2.8-2 .8h-2.4v-6zm0 1.5v3h2.4c.4 0 .8-.1 1-.4s.4-.6.4-1.1c0-.5-.1-.9-.4-1.1s-.6-.4-1-.4h-2.4zM12 21C6.5 21 2 16.5 2 12S6.5 3 12 3s10 4.5 10 9-4.5 9-10 9zM8 11v-1.5M8 15v-1.5m8-2v-1.5m0 4.5v-1.5"/></svg>
-const ApplePayIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M8.3,6.2C9.2,6.3,10,7,10.5,8c0.5,1-0.2,2.5-1.2,3.5c-0.9,1-2.3,1.5-3.3,1.2C5,12.5,4.2,11.8,3.8,11C3.2,9.8,4,8.2,5,7.2C6,6.2,7.3,6,8.3,6.2z"/><path d="M12.2,6.5c-0.1,0-0.3,0-0.4,0C10.2,6.2,8.8,7,8.2,8.2c-0.2,0.3-0.3,0.6-0.4,0.9c-0.8,0.2-1.5,0.6-2.1,1.2c-1.3,1.4-1.5,3.4-0.5,5 c0.5,0.8,1.2,1.4,2,1.8c1,0.5,2.1,0.5,3.1,0.2c0.3,0.8,0.8,1.5,1.5,2c0.8,0.6,1.8,0.8,2.8,0.5c0.1,0,0.2,0,0.3,0 c1.5-0.2,2.8-1.2,3.5-2.5c0.1-0.3,0.2-0.6,0.2-0.9c0.8-0.3,1.5-0.8,2-1.5c1.1-1.4,1-3.4-0.2-4.8c-0.6-0.8-1.5-1.3-2.4-1.5 c-0.2-1-0.8-1.8-1.8-2.5C14.8,6.8,13.5,6.5,12.2,6.5z"/></svg>
-const GooglePayIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}><path d="M12.3,10.3H18c0,1.2-0.2,2.4-0.6,3.5c-1,2.8-3.5,4.8-6.4,4.8c-3.9,0-7-3.1-7-7s3.1-7,7-7c1.9,0,3.6,0.8,4.8,2l-1.8,1.8 C13.3,8.6,12.2,8,11,8c-2.2,0-4,1.8-4,4s1.8,4,4,4c2.5,0,3.6-1.7,3.8-2.5h-3.8V10.3z"/></svg>
 
-// --- COMPONENT: ProductModal ---
-function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist, isInWishlist }) {
+// --- Type Definition ---
+interface Product {
+  id: number;
+  name: string;
+  images: string[];
+  price: string;
+  category: string;
+  description: string;
+  sizes: string[];
+  details: string[];
+}
+
+interface ProductModalProps {
+  product: Product | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onBuy: (product: Product, selectedSize: string, finalPrice: string, promoApplied: boolean) => void;
+  onToggleWishlist: (product: Product) => void;
+  isInWishlist: boolean;
+}
+
+// --- Export the component ---
+export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist, isInWishlist }: ProductModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedSize, setSelectedSize] = useState("")
   const [promoCode, setPromoCode] = useState("")
-  const [discountedPrice, setDiscountedPrice] = useState(null)
+  const [discountedPrice, setDiscountedPrice] = useState<string | null>(null)
   const [promoError, setPromoError] = useState("")
 
   useEffect(() => {
@@ -65,7 +60,6 @@ function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist, isInW
     return () => { document.body.style.overflow = "unset" }
   }, [isOpen])
 
-  // Reset state when a new product is selected
   useEffect(() => {
     if (product) {
       setCurrentImageIndex(0)
@@ -157,10 +151,66 @@ function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist, isInW
     </div>
   )
 }
+```
 
-// --- COMPONENT: CheckoutPage ---
-function CheckoutPage({ details, isOpen, onBack }) {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
+---
+
+### 2. Datoteka: `components/checkout-page.tsx`
+
+To je koda za stran za plačilo. Ustvarite novo datoteko z imenom `checkout-page.tsx` v mapi `components` in vanjo prilepite to kodo.
+
+
+```react
+"use client"
+import React, { useState, useEffect } from "react"
+import { ChevronLeft, CheckCircle } from "lucide-react"
+
+// --- Helper Component ---
+const Button = ({ children, onClick, variant = 'default', size = 'md', className = '', disabled = false }: { children: React.ReactNode, onClick?: () => void, variant?: string, size?: string, className?: string, disabled?: boolean }) => {
+  const baseStyle = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+  const variants = {
+    default: "bg-gray-900 text-white hover:bg-gray-800",
+    ghost: "hover:bg-gray-100 hover:text-gray-900",
+  }
+  const sizes = {
+    sm: "h-9 px-3",
+    md: "h-10 px-4 py-2",
+    lg: "h-11 rounded-md px-8",
+  }
+  return (
+    <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant] || variants.default} ${sizes[size] || sizes.md} ${className}`}>
+      {children}
+    </button>
+  )
+}
+
+// --- Payment Method Icons ---
+const PaypalIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M14.5.6c.3 0 .6.1.8.4l5.4 9.4c.2.4.2.9 0 1.3l-5.4 9.4c-.2.3-.5.4-.8.4H4.8c-.3 0-.6-.1-.8-.4L-1.4 11.7c-.2-.4-.2-.9 0-1.3L4 .6c.2-.3.5-.4.8-.4h9.7z"/><path d="M6.3 16v-8h2c.6 0 1.1.2 1.5.5.4.3.6.8.6 1.4 0 .6-.2 1-.5 1.3-.3.3-.8.5-1.4.5h-1v3.3h-1.2zm2.1-5.8c.3 0 .5-.1.7-.3.2-.2.3-.4.3-.7s-.1-.5-.3-.7c-.2-.2-.4-.3-.7-.3h-.8v2h.8zM12 16l-1-8h1.2l.5 4.1.5-4.1h1.1l.5 4.1.5-4.1h1.2l-1 8h-1.2l-.6-4-1.2 4h-1z"/></svg>
+const MastercardIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" {...props}><circle cx="8" cy="12" r="7" fill="#EA001B"/><circle cx="16" cy="12" r="7" fill="#F79E1B" fillOpacity="0.8"/></svg>
+const BankIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 21h18M5 18v-8h14v8M5 10V5l7-4 7 4v5M3 21h18"/></svg>
+const BitcoinIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M10.5 7.5h2.4c.8 0 1.5.3 2 .8s.8 1.2.8 2.2c0 1-.3 1.7-.8 2.2s-1.2.8-2 .8h-2.4v-6zm0 1.5v3h2.4c.4 0 .8-.1 1-.4s.4-.6.4-1.1c0-.5-.1-.9-.4-1.1s-.6-.4-1-.4h-2.4zM12 21C6.5 21 2 16.5 2 12S6.5 3 12 3s10 4.5 10 9-4.5 9-10 9zM8 11v-1.5M8 15v-1.5m8-2v-1.5m0 4.5v-1.5"/></svg>
+const ApplePayIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M8.3,6.2C9.2,6.3,10,7,10.5,8c0.5,1-0.2,2.5-1.2,3.5c-0.9,1-2.3,1.5-3.3,1.2C5,12.5,4.2,11.8,3.8,11C3.2,9.8,4,8.2,5,7.2C6,6.2,7.3,6,8.3,6.2z"/><path d="M12.2,6.5c-0.1,0-0.3,0-0.4,0C10.2,6.2,8.8,7,8.2,8.2c-0.2,0.3-0.3,0.6-0.4,0.9c-0.8,0.2-1.5,0.6-2.1,1.2c-1.3,1.4-1.5,3.4-0.5,5 c0.5,0.8,1.2,1.4,2,1.8c1,0.5,2.1,0.5,3.1,0.2c0.3,0.8,0.8,1.5,1.5,2c0.8,0.6,1.8,0.8,2.8,0.5c0.1,0,0.2,0,0.3,0 c1.5-0.2,2.8-1.2,3.5-2.5c0.1-0.3,0.2-0.6,0.2-0.9c0.8-0.3,1.5-0.8,2-1.5c1.1-1.4,1-3.4-0.2-4.8c-0.6-0.8-1.5-1.3-2.4-1.5 c-0.2-1-0.8-1.8-1.8-2.5C14.8,6.8,13.5,6.5,12.2,6.5z"/></svg>
+const GooglePayIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}><path d="M12.3,10.3H18c0,1.2-0.2,2.4-0.6,3.5c-1,2.8-3.5,4.8-6.4,4.8c-3.9,0-7-3.1-7-7s3.1-7,7-7c1.9,0,3.6,0.8,4.8,2l-1.8,1.8 C13.3,8.6,12.2,8,11,8c-2.2,0-4,1.8-4,4s1.8,4,4,4c2.5,0,3.6-1.7,3.8-2.5h-3.8V10.3z"/></svg>
+
+
+interface CheckoutDetails {
+  product: {
+    name: string;
+    images: string[];
+  };
+  selectedSize: string;
+  finalPrice: string;
+  promoApplied: boolean;
+}
+
+interface CheckoutPageProps {
+  details: CheckoutDetails | null;
+  isOpen: boolean;
+  onBack: () => void;
+}
+
+export function CheckoutPage({ details, isOpen, onBack }: CheckoutPageProps) {
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   
@@ -242,10 +292,50 @@ function CheckoutPage({ details, isOpen, onBack }) {
     </div>
   )
 }
+```
 
-// --- MAIN APPLICATION COMPONENT: App ---
-export default function App() {
-  // Sample product data. In a real app, this would come from an API.
+---
+
+### 3. Datoteka: `app/page.tsx` (ali `app/products/page.tsx`)
+
+To je glavna stran, ki prikazuje izdelke. Zamenjajte vsebino vaše obstoječe datoteke `page.tsx` s to kodo. Ta koda pravilno uvaža `ProductModal` in `CheckoutPage` iz njunih novih lokacij.
+
+
+```react
+"use client"
+import React, { useState } from "react"
+import { ProductModal } from "@/components/product-modal" // Pravilen uvoz
+import { CheckoutPage } from "@/components/checkout-page" // Pravilen uvoz
+
+// --- Tipovi in Pomožne komponente ---
+interface Product {
+  id: number;
+  name: string;
+  images: string[];
+  price: string;
+  category: string;
+  description: string;
+  sizes: string[];
+  details: string[];
+}
+
+interface CheckoutDetails {
+  product: Product;
+  selectedSize: string;
+  finalPrice: string;
+  promoApplied: boolean;
+}
+
+const Button = ({ children, onClick, className = '' }: { children: React.ReactNode, onClick?: () => void, className?: string }) => (
+  <button onClick={onClick} className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors ${className}`}>
+    {children}
+  </button>
+);
+
+
+// --- Glavna komponenta strani ---
+export default function HomePage() {
+  // Podatki o izdelkih
   const [products] = useState<Product[]>([
     {
       id: 1,
@@ -276,13 +366,13 @@ export default function App() {
     }
   ]);
 
-  // State management for the entire application
+  // Stanja za upravljanje aplikacije
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const [checkoutDetails, setCheckoutDetails] = useState<CheckoutDetails | null>(null)
   const [wishlist, setWishlist] = useState<number[]>([])
 
-  // Event Handlers
+  // Funkcije za upravljanje dogodkov
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
   }
@@ -302,8 +392,8 @@ export default function App() {
       finalPrice: price,
       promoApplied: promo,
     })
-    setSelectedProduct(null); // Close the product modal
-    setIsCheckoutOpen(true); // Open the checkout page
+    setSelectedProduct(null);
+    setIsCheckoutOpen(true);
   }
 
   const handleBackFromCheckout = () => {
@@ -323,7 +413,7 @@ export default function App() {
                 <div className="uppercase tracking-wide text-sm text-purple-600 font-semibold">{product.category}</div>
                 <h2 className="block mt-1 text-lg leading-tight font-bold text-black">{product.name}</h2>
                 <p className="mt-2 text-gray-500">{product.price}</p>
-                <Button onClick={() => handleProductSelect(product)} className="mt-4 w-full bg-purple-600 text-white">
+                <Button onClick={() => handleProductSelect(product)} className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                   View Details
                 </Button>
               </div>
@@ -349,3 +439,12 @@ export default function App() {
     </div>
   )
 }
+```
+
+### Povzetek sprememb:
+
+1.  **Ločene datoteke:** Vsaka glavna komponenta (`ProductModal`, `CheckoutPage`) je zdaj v svoji datoteki znotraj mape `components`.
+2.  **Pravilni `export`:** Vsaka datoteka komponente uporablja `export function ...`, kar omogoča, da jo uvozite v drugih datotekah.
+3.  **Pravilni `import`:** Glavna stran `app/page.tsx` zdaj pravilno uvaža komponente z `import { ProductModal } from '@/components/product-modal'`.
+
+S temi spremembami bi morala vaša aplikacija delovati brez napak pri gradnji. Preprosto zamenjajte vsebino ustreznih datotek s kodo, ki sem jo priprav
