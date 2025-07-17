@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -28,6 +27,22 @@ interface ProductModalProps {
 export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist, isInWishlist }: ProductModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedSize, setSelectedSize] = useState("")
+  const [promoCode, setPromoCode] = useState("")
+  const [discountedPrice, setDiscountedPrice] = useState<string | null>(null)
+  const [promoError, setPromoError] = useState("")
+
+  // Reset state when product changes or modal closes
+  useEffect(() => {
+    if (isOpen) {
+      // When a new product is opened, reset the state
+      setCurrentImageIndex(0)
+      setSelectedSize("")
+      setPromoCode("")
+      setDiscountedPrice(null)
+      setPromoError("")
+    }
+  }, [isOpen, product])
+
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -46,7 +61,6 @@ export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist
       document.body.style.right = "unset"
       document.body.style.width = "unset"
     }
-
     return () => {
       document.body.style.overflow = "unset"
       document.body.style.position = "unset"
@@ -68,10 +82,27 @@ export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist
   }
 
   const handleClose = () => {
-    setSelectedSize("")
-    setCurrentImageIndex(0)
     onClose()
   }
+
+  const handleApplyPromoCode = () => {
+    if (promoCode.toUpperCase() === "SUMMER15") {
+      // Assuming price is in format like "$99.99" or "€99.99"
+      const numericPrice = parseFloat(product.price.replace(/[^0-9.]/g, ''));
+      if (!isNaN(numericPrice)) {
+        const newPrice = numericPrice * 0.85;
+        const currencySymbol = product.price.match(/[^0-9.]/)?.[0] || '$';
+        setDiscountedPrice(`${currencySymbol}${newPrice.toFixed(2)}`);
+        setPromoError("");
+      } else {
+        setPromoError("Invalid price format.");
+      }
+    } else {
+      setPromoError("Invalid promo code.");
+      setDiscountedPrice(null);
+    }
+  };
+
 
   return (
     <div className="fixed inset-0 bg-white z-[60] overflow-y-auto">
@@ -119,7 +150,6 @@ export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist
               </>
             )}
           </div>
-
           {product.images.length > 1 && (
             <div className="flex gap-2 justify-center overflow-x-auto pb-2">
               {product.images.map((image, index) => (
@@ -151,7 +181,16 @@ export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist
                 {product.category}
               </span>
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
-              <p className="text-2xl md:text-3xl font-bold text-purple-600">{product.price}</p>
+              <div className="flex items-baseline gap-2">
+                <p className={`text-2xl md:text-3xl font-bold ${discountedPrice ? 'text-gray-400 line-through' : 'text-purple-600'}`}>
+                    {product.price}
+                </p>
+                {discountedPrice && (
+                    <p className="text-2xl md:text-3xl font-bold text-purple-600">
+                        {discountedPrice}
+                    </p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -177,6 +216,28 @@ export function ProductModal({ product, isOpen, onClose, onBuy, onToggleWishlist
                 ))}
               </div>
             </div>
+            
+            {/* Promo Code Section */}
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Promo Code</h3>
+              <div className="flex items-start gap-2">
+                <div className="flex-grow">
+                    <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => {
+                            setPromoCode(e.target.value);
+                            setPromoError(""); // Clear error on typing
+                        }}
+                        placeholder="Enter code"
+                        className="w-full px-3 py-2 border rounded-lg font-medium text-sm transition-colors border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                     {promoError && <p className="text-red-500 text-sm mt-1">{promoError}</p>}
+                </div>
+                <Button onClick={handleApplyPromoCode} className="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg">Apply</Button>
+              </div>
+            </div>
+
 
             <div>
               <h3 className="text-lg font-semibold mb-2">Product Details</h3>
