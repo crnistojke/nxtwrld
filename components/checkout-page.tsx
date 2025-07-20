@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button"
 import { loadStripe } from '@stripe/stripe-js';
 import { Truck, RefreshCw, Headphones } from "lucide-react"
 
-// Preberemo javni ključ iz okoljskih spremenljivk
-const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-
-// Naložimo Stripe.js samo, če ključ obstaja
-const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
+// Naložimo Stripe.js. Zanašamo se na to, da bo Vercel pravilno vstavil spremenljivko.
+// Klicnik (!) na koncu pove TypeScriptu: "Vem, da ta vrednost ne bo prazna."
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface Product {
   name: string;
@@ -33,25 +31,18 @@ export function CheckoutPage({ details, isOpen, onBack }: CheckoutPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Na začetku preverimo, ali ključ sploh obstaja
-  if (isOpen && !stripePromise) {
-    return (
-        <div className="fixed inset-0 bg-white z-[80] flex items-center justify-center p-4">
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-md">
-                <p className="font-bold">Configuration Error</p>
-                <p>Stripe publishable key is missing. Please check your environment variables in Vercel.</p>
-                <p className="text-sm mt-2">The variable name must be exactly: <code className="bg-red-200 p-1 rounded">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></p>
-                 <Button variant="outline" size="sm" onClick={onBack} className="mt-4">Back</Button>
-            </div>
-        </div>
-    );
-  }
-
   if (!isOpen || !details) return null;
 
   const handleCheckout = async () => {
     setIsLoading(true);
     setError(null);
+
+    // Dodaten varnostni pregled, če je ključ res na voljo
+    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+        setError("Stripe configuration error. Publishable key not found.");
+        setIsLoading(false);
+        return;
+    }
 
     try {
       const response = await fetch('/api/create-checkout-session', {
@@ -63,13 +54,12 @@ export function CheckoutPage({ details, isOpen, onBack }: CheckoutPageProps) {
       const session = await response.json();
 
       if (session.error) {
-        // Ta napaka pride iz našega backenda
         throw new Error(session.error);
       }
 
       const stripe = await stripePromise;
       if (!stripe) {
-        throw new Error('Stripe.js has not loaded yet.');
+        throw new Error('Stripe.js could not be loaded.');
       }
 
       const { error: stripeError } = await stripe.redirectToCheckout({
