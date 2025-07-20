@@ -1,14 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
-}
+  // Ta datoteka je lahko prazna, če ne potrebujete posebnih nastavitev.
+  // Pustimo jo tako, da zagotovimo standardno delovanje.
+};
 
-export default nextConfig
+export default nextConfig;
