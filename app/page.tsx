@@ -15,6 +15,7 @@ import { WishlistModal } from "@/components/wishlist-modal"
 import { ProductCard } from "@/components/product-card"
 import { ProtectedLink } from "@/components/protected-link"
 import { useWishlist } from "@/hooks/use-wishlist"
+import { EnvVarTester } from "@/components/EnvVarTester" // <-- 1. KORAK: UVOZITE NOVO KOMPONENTO
 
 interface Product {
   id: number
@@ -53,7 +54,6 @@ export default function HomePage() {
       id: 1,
       name: "NXT WRLD Globe Tee - White",
       images: ["/images/nxtwrldtshirtwhite.webp", "/images/nxtwrldtshirtwhite2.webp"],
-      // POPRAVEK: Cena v EUR
       price: "€29.99",
       category: "t-shirt",
       description:
@@ -72,7 +72,6 @@ export default function HomePage() {
       id: 2,
       name: "NXT WRLD Globe Tee - Black",
       images: ["/images/nxtwrldtshirt.webp", "/images/nxtwrldtshirt2.webp"],
-      // POPRAVEK: Cena v EUR
       price: "€29.99",
       category: "t-shirt",
       description:
@@ -91,7 +90,6 @@ export default function HomePage() {
       id: 3,
       name: "NXT WRLD Globe Hoodie",
       images: ["/images/nxtwrldhoodie2.webp", "/images/nxtwrldhoodie.webp"],
-      // POPRAVEK: Cena v EUR
       price: "€54.99",
       category: "hoodie",
       description:
@@ -147,6 +145,7 @@ export default function HomePage() {
 
   return (
     <div className="page-wrapper">
+      <EnvVarTester /> {/* <-- 2. KORAK: DODAJTE TESTER NA VRH STRANI */}
       <div className="content-wrapper">
         <NotificationBanner />
         <MobileNavigation
@@ -160,6 +159,8 @@ export default function HomePage() {
           wishlistCount={wishlistCount}
         />
 
+        {/* ... ostala vsebina strani ostane nespremenjena ... */}
+        
         <section className="relative h-[70vh] md:h-[80vh] bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 overflow-hidden mt-16 md:mt-0">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative container mx-auto px-4 h-full flex items-center justify-center text-center z-10">
