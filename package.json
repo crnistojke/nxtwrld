@@ -39,6 +39,9 @@
     "@radix-ui/react-tooltip": "latest",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
+    "@stripe/react-stripe-js": "^2.7.3",
+    "@stripe/stripe-js": "^4.1.0",
+    "stripe": "^16.2.0"
     "clsx": "^2.1.1",
     "cmdk": "latest",
     "date-fns": "4.1.0",
