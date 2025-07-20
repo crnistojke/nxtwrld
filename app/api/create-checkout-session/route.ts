@@ -1,16 +1,8 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+// Inicializiramo Stripe z našim skrivnim ključem
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  throw new Error('Missing STRIPE_SECRET_KEY environment variable');
-}
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2024-04-10',
-});
-
+// Definiramo tip za izdelek, ki ga pričakujemo od frontenda
 interface Product {
   name: string;
   images: string[];
@@ -19,32 +11,40 @@ interface Product {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { product, selectedSize, finalPrice }: { product: Product; selectedSize: string; finalPrice: string } = body;
+    const { product, selectedSize, finalPrice } = await request.json();
 
     if (!product || !selectedSize || !finalPrice) {
       return NextResponse.json({ error: 'Missing product information' }, { status: 400 });
     }
 
-    const numericPrice = parseFloat(finalPrice.replace(/[^0-9.]/g, ''));
-    const priceInCents = Math.round(numericPrice * 100);
+    // Pretvorimo ceno v cente za Stripe API
+    const priceInCents = Math.round(parseFloat(finalPrice.replace(/[^0-9.]/g, '')) * 100);
 
-    if (isNaN(priceInCents) || priceInCents <= 0) {
-      return NextResponse.json({ error: 'Invalid price format' }, { status: 400 });
+    if (isNaN(priceInCents)) {
+        return NextResponse.json({ error: 'Invalid price format' }, { status: 400 });
     }
 
+    // POPRAVEK: Ustvarimo polno pot do slike
+    const origin = request.headers.get('origin') || 'https://nxtwrldoff.vercel.app';
+    const imageUrl = product.images[0].startsWith('/') 
+      ? `${origin}${product.images[0]}` 
+      : product.images[0];
+
+    // Ustvarimo Stripe Checkout sejo
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'paypal'],
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            // POPRAVEK: Spremenimo valuto v EUR
+            currency: 'eur',
             product_data: {
               name: product.name,
-              images: [product.images[0]],
+              // POPRAVEK: Uporabimo polno pot do slike
+              images: [imageUrl],
               metadata: {
-                size: selectedSize,
-              },
+                  size: selectedSize,
+              }
             },
             unit_amount: priceInCents,
           },
@@ -52,13 +52,17 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${request.headers.get('origin')}/?payment_success=true`,
-      cancel_url: `${request.headers.get('origin')}/?payment_canceled=true`,
+      // URL-ja, na katera bo Stripe preusmeril uporabnika po plačilu
+      success_url: `${origin}/?payment_success=true`,
+      cancel_url: `${origin}/?payment_canceled=true`,
     });
 
+    // Vrnemo ID seje na frontend
     return NextResponse.json({ sessionId: session.id });
+
   } catch (err: any) {
-    console.error('Error creating Stripe session:', err.message);
-    return NextResponse.json({ error: 'Error creating checkout session' }, { status: 500 });
+    // To nam bo dalo boljši vpogled v napako v Vercel logih
+    console.error('Stripe API Error:', err.message);
+    return NextResponse.json({ error: 'Error creating checkout session. Check server logs.' }, { status: 500 });
   }
 }
