@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button"
 import { loadStripe } from '@stripe/stripe-js';
 import { Truck, RefreshCw, Headphones } from "lucide-react"
 
-// Naložimo Stripe.js z javnim ključem
-// To je najbolje narediti izven komponente, da se ne ponavlja ob vsakem renderju
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// Preberemo javni ključ iz okoljskih spremenljivk
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+// Naložimo Stripe.js samo, če ključ obstaja
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 interface Product {
   name: string;
@@ -31,6 +33,20 @@ export function CheckoutPage({ details, isOpen, onBack }: CheckoutPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Na začetku preverimo, ali ključ sploh obstaja
+  if (isOpen && !stripePromise) {
+    return (
+        <div className="fixed inset-0 bg-white z-[80] flex items-center justify-center p-4">
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-md">
+                <p className="font-bold">Configuration Error</p>
+                <p>Stripe publishable key is missing. Please check your environment variables in Vercel.</p>
+                <p className="text-sm mt-2">The variable name must be exactly: <code className="bg-red-200 p-1 rounded">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></p>
+                 <Button variant="outline" size="sm" onClick={onBack} className="mt-4">Back</Button>
+            </div>
+        </div>
+    );
+  }
+
   if (!isOpen || !details) return null;
 
   const handleCheckout = async () => {
@@ -38,36 +54,30 @@ export function CheckoutPage({ details, isOpen, onBack }: CheckoutPageProps) {
     setError(null);
 
     try {
-      // 1. Kličemo naš backend, da ustvari Stripe sejo
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(details), // Pošljemo podrobnosti o naročilu
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(details),
       });
 
       const session = await response.json();
 
       if (session.error) {
+        // Ta napaka pride iz našega backenda
         throw new Error(session.error);
       }
 
-      // 2. Pridobimo Stripe instanco
       const stripe = await stripePromise;
       if (!stripe) {
         throw new Error('Stripe.js has not loaded yet.');
       }
 
-      // 3. Preusmerimo uporabnika na Stripe Checkout stran
-      const { error } = await stripe.redirectToCheckout({
+      const { error: stripeError } = await stripe.redirectToCheckout({
         sessionId: session.sessionId,
       });
 
-      if (error) {
-        // Ta del se izvede samo, če pride do napake pri preusmeritvi (npr. blokada brskalnika)
-        console.error('Stripe redirection error:', error);
-        setError(error.message || 'An unexpected error occurred.');
+      if (stripeError) {
+        throw new Error(stripeError.message);
       }
     } catch (err: any) {
       console.error('Checkout error:', err);
