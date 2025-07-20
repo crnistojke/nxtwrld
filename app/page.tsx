@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Truck, RefreshCw, Headphones } from "lucide-react"
 import { ProductModal } from "@/components/product-modal"
-import { CheckoutPage } from "@/components/checkout-page" // NOVO: Uvoz strani za plačilo
+import { CheckoutPage } from "@/components/checkout-page"
 import { NotificationBanner } from "@/components/notification-banner"
 import { MobileNavigation } from "@/components/mobile-navigation"
 import { DesktopNavigation } from "@/components/desktop-navigation"
@@ -27,7 +27,6 @@ interface Product {
   details: string[]
 }
 
-// NOVO: Tip za podrobnosti o plačilu
 interface CheckoutDetails {
   product: Product;
   selectedSize: string;
@@ -40,8 +39,6 @@ export default function HomePage() {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false)
-  
-  // NOVO: Stanja za upravljanje procesa plačila
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const [checkoutDetails, setCheckoutDetails] = useState<CheckoutDetails | null>(null)
 
@@ -56,7 +53,8 @@ export default function HomePage() {
       id: 1,
       name: "NXT WRLD Globe Tee - White",
       images: ["/images/nxtwrldtshirtwhite.webp", "/images/nxtwrldtshirtwhite2.webp"],
-      price: "$29.99",
+      // POPRAVEK: Cena v EUR
+      price: "€29.99",
       category: "t-shirt",
       description:
         "Classic white tee featuring our iconic globe and butterflies design. Made from premium cotton blend for ultimate comfort and durability.",
@@ -74,7 +72,8 @@ export default function HomePage() {
       id: 2,
       name: "NXT WRLD Globe Tee - Black",
       images: ["/images/nxtwrldtshirt.webp", "/images/nxtwrldtshirt2.webp"],
-      price: "$29.99",
+      // POPRAVEK: Cena v EUR
+      price: "€29.99",
       category: "t-shirt",
       description:
         "Bold black tee with our signature transformation design. Perfect for making a statement while staying comfortable.",
@@ -92,7 +91,8 @@ export default function HomePage() {
       id: 3,
       name: "NXT WRLD Globe Hoodie",
       images: ["/images/nxtwrldhoodie2.webp", "/images/nxtwrldhoodie.webp"],
-      price: "$54.99",
+      // POPRAVEK: Cena v EUR
+      price: "€54.99",
       category: "hoodie",
       description:
         "Premium hoodie featuring our transformative globe design. Cozy and stylish, perfect for any season.",
@@ -113,7 +113,6 @@ export default function HomePage() {
     setIsProductModalOpen(true)
   }
 
-  // NOVO: Posodobljena funkcija za nakup
   const handleBuyNow = (details: CheckoutDetails) => {
     setCheckoutDetails(details);
     setIsProductModalOpen(false);
@@ -324,7 +323,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Modals */}
       <ProductModal
         product={selectedProduct}
         isOpen={isProductModalOpen}
@@ -334,7 +332,6 @@ export default function HomePage() {
         isInWishlist={selectedProduct ? isInWishlist(selectedProduct.id) : false}
       />
       
-      {/* NOVO: Stran za plačilo */}
       <CheckoutPage 
         isOpen={isCheckoutOpen}
         details={checkoutDetails}
