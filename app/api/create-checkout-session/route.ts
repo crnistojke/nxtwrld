@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// ✅ Uporabi eksplicitni import za Stripe (boljši TS support)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-04-10', // 🔁 uporabi trenutno različico API-ja
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+  throw new Error('Missing STRIPE_SECRET_KEY environment variable');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2024-04-10',
 });
 
-// ✅ Tip za vhodne podatke
 interface Product {
   name: string;
   images: string[];
@@ -22,7 +26,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing product information' }, { status: 400 });
     }
 
-    // ✅ Pretvori ceno v cente (za Stripe je obvezno celo število v centih)
     const numericPrice = parseFloat(finalPrice.replace(/[^0-9.]/g, ''));
     const priceInCents = Math.round(numericPrice * 100);
 
@@ -30,9 +33,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid price format' }, { status: 400 });
     }
 
-    // ✅ Stripe session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'], // ⚠️ 'paypal' trenutno ni uradno podprt v Stripe Checkout
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
@@ -55,7 +57,6 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ sessionId: session.id });
-
   } catch (err: any) {
     console.error('Error creating Stripe session:', err.message);
     return NextResponse.json({ error: 'Error creating checkout session' }, { status: 500 });
