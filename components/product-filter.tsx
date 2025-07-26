@@ -97,10 +97,10 @@ export function ProductFilter({ isOpen, onClose, onApplyFilters }: ProductFilter
               <h3 className="font-medium mb-3">Price Range</h3>
               <div className="space-y-2">
                 {[
-                  { label: "Under $30", value: "0-30" },
-                  { label: "$30 - $50", value: "30-50" },
-                  { label: "$50 - $70", value: "50-70" },
-                  { label: "Over $70", value: "70+" },
+                  { label: "Under €30", value: "0-30" },
+                  { label: "€30 - €50", value: "30-50" },
+                  { label: "€50 - €70", value: "50-70" },
+                  { label: "Over €70", value: "70+" },
                 ].map((range) => (
                   <label key={range.value} className="flex items-center space-x-2">
                     <input

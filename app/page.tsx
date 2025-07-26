@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Truck, RefreshCw, Headphones } from "lucide-react"
 import { ProductModal } from "@/components/product-modal"
-import { CheckoutPage } from "@/components/checkout-page"
+import { PurchaseModal } from "@/components/purchase-modal"
 import { NotificationBanner } from "@/components/notification-banner"
 import { MobileNavigation } from "@/components/mobile-navigation"
 import { DesktopNavigation } from "@/components/desktop-navigation"
@@ -15,17 +15,24 @@ import { WishlistModal } from "@/components/wishlist-modal"
 import { ProductCard } from "@/components/product-card"
 import { ProtectedLink } from "@/components/protected-link"
 import { useWishlist } from "@/hooks/use-wishlist"
-import { Product, CheckoutDetails } from "@/types" // <-- TO JE EDINA SPREMEMBA, KI POPRAVI NAPAKO
 
-// Odstranjene so bile lokalne definicije za 'Product' in 'CheckoutDetails'
+interface Product {
+  id: number
+  name: string
+  images: string[]
+  price: string
+  category: string
+  description: string
+  sizes: string[]
+  details: string[]
+}
 
 export default function HomePage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false)
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
-  const [checkoutDetails, setCheckoutDetails] = useState<CheckoutDetails | null>(null)
 
   const { wishlistItems, toggleWishlist, isInWishlist, wishlistCount, removeFromWishlist } = useWishlist()
 
@@ -45,6 +52,8 @@ export default function HomePage() {
       sizes: ["XS", "S", "M", "L", "XL", "XXL"],
       details: [
         "100% Premium Cotton",
+        "Screen-printed design",
+        "Pre-shrunk fabric",
         "Screen-printed design",
         "Pre-shrunk fabric",
         "Reinforced seams",
@@ -74,7 +83,7 @@ export default function HomePage() {
       id: 3,
       name: "NXT WRLD Globe Hoodie",
       images: ["/images/nxtwrldhoodie2.webp", "/images/nxtwrldhoodie.webp"],
-      price: "€54.99",
+      price: "€59.99",
       category: "hoodie",
       description:
         "Premium hoodie featuring our transformative globe design. Cozy and stylish, perfect for any season.",
@@ -95,19 +104,14 @@ export default function HomePage() {
     setIsProductModalOpen(true)
   }
 
-  const handleBuyNow = (details: CheckoutDetails) => {
-    setCheckoutDetails(details);
-    setIsProductModalOpen(false);
-    setIsCheckoutOpen(true);
-  }
-  
-  const handleBackFromCheckout = () => {
-      setIsCheckoutOpen(false);
-      setCheckoutDetails(null);
+  const handleBuyClick = () => {
+    setIsProductModalOpen(false)
+    setIsPurchaseModalOpen(true)
   }
 
-  const closeProductModal = () => {
+  const closeModals = () => {
     setIsProductModalOpen(false)
+    setIsPurchaseModalOpen(false)
     setSelectedProduct(null)
   }
 
@@ -130,18 +134,24 @@ export default function HomePage() {
   return (
     <div className="page-wrapper">
       <div className="content-wrapper">
+        {/* Notification Banner */}
         <NotificationBanner />
+
+        {/* Mobile Navigation */}
         <MobileNavigation
           onContactClick={handleContactClick}
           onWishlistClick={handleWishlistClick}
           wishlistCount={wishlistCount}
         />
+
+        {/* Desktop Navigation */}
         <DesktopNavigation
           onContactClick={handleContactClick}
           onWishlistClick={handleWishlistClick}
           wishlistCount={wishlistCount}
         />
 
+        {/* Hero Section */}
         <section className="relative h-[70vh] md:h-[80vh] bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 overflow-hidden mt-16 md:mt-0">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative container mx-auto px-4 h-full flex items-center justify-center text-center z-10">
@@ -169,6 +179,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Products Section */}
         <section className="section-padding py-12 md:py-20 bg-gray-50 relative z-10 overflow-hidden">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 md:mb-16">
@@ -190,6 +201,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Features Section */}
         <section className="py-16 bg-white overflow-hidden">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -220,6 +232,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Newsletter Section */}
         <section className="py-16 bg-gradient-to-r from-purple-600 to-blue-600 overflow-hidden">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">Stay Connected</h2>
@@ -236,9 +249,11 @@ export default function HomePage() {
         </section>
       </div>
 
+      {/* Footer - Fixed at bottom with no extra space */}
       <footer className="bg-white border-t border-gray-200 py-6 md:py-8 relative z-10">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-6 md:mb-8">
+            {/* Brand Section */}
             <div className="md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
                 <Image
@@ -281,44 +296,70 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
+
+            {/* Quick Links */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-3 md:mb-4">Quick Links</h4>
               <ul className="space-y-1 md:space-y-2">
-                <li><Link href="/" className="text-gray-600 hover:text-purple-600">Home</Link></li>
-                <li><ProtectedLink href="/products" className="text-gray-600 hover:text-purple-600">Products</ProtectedLink></li>
-                <li><ProtectedLink href="/about" className="text-gray-600 hover:text-purple-600">About</ProtectedLink></li>
-                <li><ProtectedLink href="/drops" className="text-gray-600 hover:text-purple-600">Drops</ProtectedLink></li>
+                <li>
+                  <Link href="/" className="text-gray-600 hover:text-purple-600 transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <ProtectedLink href="/products" className="text-gray-600 hover:text-purple-600 transition-colors">
+                    Products
+                  </ProtectedLink>
+                </li>
+                <li>
+                  <ProtectedLink href="/about" className="text-gray-600 hover:text-purple-600 transition-colors">
+                    About
+                  </ProtectedLink>
+                </li>
+                <li>
+                  <ProtectedLink href="/drops" className="text-gray-600 hover:text-purple-600 transition-colors">
+                    Drops
+                  </ProtectedLink>
+                </li>
               </ul>
             </div>
+
+            {/* Support */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-3 md:mb-4">Support</h4>
               <ul className="space-y-1 md:space-y-2">
-                <li><Link href="/terms-of-service" className="text-gray-600 hover:text-purple-600">Terms of Service</Link></li>
-                <li><span className="text-gray-600">nxtwrld.wear@gmail.com</span></li>
-                <li><span className="text-gray-600">@nxtwrld.wear</span></li>
+                <li>
+                  <Link href="/terms-of-service" className="text-gray-600 hover:text-purple-600 transition-colors">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <span className="text-gray-600">nxtwrld.wear@gmail.com</span>
+                </li>
+                <li>
+                  <span className="text-gray-600">@nxtwrld.wear</span>
+                </li>
               </ul>
             </div>
           </div>
+
           <div className="border-t border-gray-200 pt-4 md:pt-6 text-center">
             <p className="text-gray-500 text-sm md:text-base">&copy; 2025 NXT WRLD. All rights reserved.</p>
           </div>
         </div>
       </footer>
 
+      {/* Modals */}
       <ProductModal
         product={selectedProduct}
         isOpen={isProductModalOpen}
-        onClose={closeProductModal}
-        onBuy={handleBuyNow}
+        onClose={closeModals}
+        onBuy={handleBuyClick}
         onToggleWishlist={toggleWishlist}
         isInWishlist={selectedProduct ? isInWishlist(selectedProduct.id) : false}
       />
-      
-      <CheckoutPage 
-        isOpen={isCheckoutOpen}
-        details={checkoutDetails}
-        onBack={handleBackFromCheckout}
-      />
+
+      <PurchaseModal isOpen={isPurchaseModalOpen} onClose={closeModals} productName={selectedProduct?.name || ""} />
 
       <ContactModal isOpen={isContactModalOpen} onClose={closeContactModal} />
 

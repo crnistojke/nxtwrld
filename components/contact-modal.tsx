@@ -201,9 +201,6 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
             <p>
               <strong>Email:</strong> nxtwrld.wear@gmail.com
             </p>
-             <p>
-              <strong>Phone:</strong> +381 61 1306825
-            </p>
             <p>
               <strong>Instagram:</strong> @nxtwrld.wear
             </p>
